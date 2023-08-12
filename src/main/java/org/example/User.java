@@ -1,38 +1,34 @@
 package org.example;
 
-interface IRegister{
-    abstract void register(String name, String password);
-}
-interface ILogin{
-    abstract User_as_object login(String name, String password);
+interface IRequest{
+    final UserDB user_db = new UserDB();
+    abstract User_as_object action(String name, String password);
 }
 
-class Register implements IRegister{
+class Register implements IRequest{
     @Override
-    public void register(String name, String password){
-        UserDB user_db = new UserDB();
+    public User_as_object action(String name, String password){
         user_db.createUser(name, password);
+        return null;
     }
 }
-class Login implements ILogin{
+class Login implements IRequest{
     @Override
-    public User_as_object login(String name, String password) {
-        UserDB user_db = new UserDB();
+    public User_as_object action(String name, String password) {
         User_as_object user = user_db.selectUser(name);
 
-
-        try {                                           // I add check existing name, bad but is works
+        try {                                           // I added check existing name, bad but is works
             if (user.getPassword().equals(password)) {
-                System.out.println("login");
+                System.out.println("login is right");
                 return user;
             } else {
-                System.out.println("not login");
+                System.out.println("not logined due to wrong password");
                 return null;
             }
 
 
         } catch (NullPointerException e) {
-            System.out.println("That name does not exist");
+            System.out.println("not logined due to wrong login");
             return null;
         }
     }
@@ -43,27 +39,27 @@ public class User {
 
     private User_as_object user;
     private boolean authenticated = false;
-    Register user_register = new Register();
-    Login user_login = new Login();
-
+    Register userRegisterRequest = new Register();
+    Login userLoginRequest = new Login();
+// ======================================================================
     public void registerRequest(String name, String password){
-        user_register.register(name, password);
-        System.out.println("rrs");
+        userRegisterRequest.action(name, password);
     }
 
     public void loginRequest(String name, String password) {
-        this.user = user_login.login(name, password);
+        this.user = userLoginRequest.action(name, password);
         if (this.user != null){
             this.authenticated = true;
+            System.out.println("Logined");
         }
     }
     void logoutRequest(){
         this.user = null;
         this.authenticated = false;
-        System.out.println("logout");
+        System.out.println("logouted");
     }
 
-    // ===========================================================
+// ==============================================================================
     public String getUsername(){
 
         if (this.authenticated){

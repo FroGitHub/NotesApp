@@ -18,8 +18,13 @@ public class UserDB {
                 preparedStatement.setString(1, username);
                 preparedStatement.setString(2, password);
 
-                preparedStatement.executeUpdate();
-                System.out.println("User registered successfully.");
+                try {
+                    preparedStatement.executeUpdate();
+                    System.out.println("User registered successfully");
+                } catch (SQLException e){
+                    System.out.println("This name already exists");
+                }
+
 
             } catch (SQLException e) {
                 e.printStackTrace();
