@@ -1,52 +1,52 @@
 package org.example;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+
+import java.sql.*;
 
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "user_table")
-class User_MySQL {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_user")
-    private int id;
-
-    @Column(name = "name_user")
-    private String username;
-
-    @Column(name = "password_user")
-    private String password;
-
-    User_MySQL(String username, String password){
-        this.username = username;
-        this.password = password;
-    }
-
-}
 public class UserDB {
 
-    private SessionFactory factory;
+        String jdbcUrl = "jdbc:mysql://127.0.0.1:3306/notesappdb"; // URL підключення до бази даних
+        private String username = "root"; // Ім'я користувача бази даних
+        private String password = "fdpgsp2425SS"; // Пароль бази даних
 
-    public UserDB() {
-        factory = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .addAnnotatedClass(UserDB.class)
-                .buildSessionFactory();
-    }
+        public void createUser(String username, String password) {
+            String sql = "INSERT INTO user_table (name_user, password_user) VALUES (?, ?)";
 
-    public void create_user(User_MySQL user) {
-        Session session = factory.getCurrentSession();
-        try {
-            session.beginTransaction();
-            session.save(user);
-            session.getTransaction().commit();
-            System.out.println("cu_db_s");
-        } finally {
-            factory.close();
+            try (Connection connection = DriverManager.getConnection(jdbcUrl, this.username, this.password);
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, password);
+
+                preparedStatement.executeUpdate();
+                System.out.println("User registered successfully.");
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+    public User_as_object selectUser(String name) {
+        User_as_object user = new User_as_object();
+
+        String sql = "SELECT name_user, password_user FROM user_table WHERE name_user = ?";
+
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, this.username, this.password);
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, name);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    user.setUsername(resultSet.getString("name_user"));
+                    user.setPassword(resultSet.getString("password_user"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
 
 }
