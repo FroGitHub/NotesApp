@@ -1,13 +1,10 @@
-package org.example;
+package org.example.classesDB;
+
+import org.example.objects.User_as_object;
 
 import java.sql.*;
 
-
-public class UserDB {
-
-        String jdbcUrl = "jdbc:mysql://127.0.0.1:3306/notesappdb"; // URL підключення до бази даних
-        private String username = "root"; // Ім'я користувача бази даних
-        private String password = "fdpgsp2425SS"; // Пароль бази даних
+public class UserDB implements IDB {
 
         public void createUser(String username, String password) {
             String sql = "INSERT INTO user_table (name_user, password_user) VALUES (?, ?)";
@@ -33,15 +30,16 @@ public class UserDB {
     public User_as_object selectUser(String name) {
         User_as_object user = new User_as_object();
 
-        String sql = "SELECT name_user, password_user FROM user_table WHERE name_user = ?";
+        String sql = "SELECT id_user, name_user, password_user FROM user_table WHERE name_user = ?";
 
         try (Connection connection = DriverManager.getConnection(jdbcUrl, this.username, this.password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) { // connection to MySQL
 
-            preparedStatement.setString(1, name);
+            preparedStatement.setString(1, name); // WHERE name_user = name
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) { // get object
                 if (resultSet.next()) {
+                    user.setId(resultSet.getInt("id_user"));
                     user.setUsername(resultSet.getString("name_user"));
                     user.setPassword(resultSet.getString("password_user"));
                 }
@@ -55,3 +53,4 @@ public class UserDB {
     }
 
 }
+
